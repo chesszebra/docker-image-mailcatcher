@@ -16,7 +16,7 @@ RUN addgroup mailcatcher \
 RUN set -xe \
  && apk add --no-cache libstdc++ sqlite-libs \
  && apk add --no-cache --virtual .build-deps build-base sqlite-dev \
- && gem install mailcatcher --no-ri --no-rdoc \
+ && gem install mailcatcher \
  && apk del .build-deps
 
 # Run as node

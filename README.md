@@ -1,11 +1,11 @@
 # docker-image-mailcatcher
 
-[![Build Status](https://travis-ci.org/chesszebra/docker-image-mailcatcher.svg?branch=master)](https://travis-ci.org/chesszebra/docker-image-mailcatcher)
-
-A Docker image that creates a Mailcatcher container.
+A Docker image that runs Mailcatcher.
 
 ## Usage
 
-```bash
-docker pull chesszebra/mailcatcher
+Basic usage:
+
+```
+docker run --rm -p 1080:1080 -p 1025:1025 --name mailcatcher chesszebra/mailcatcher
 ```

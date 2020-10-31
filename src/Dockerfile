@@ -1,15 +1,29 @@
-FROM ruby:2.2
+FROM ruby:2.5-alpine3.7
 
-LABEL maintainer="developers@chesszebra.com"
+# Run as root
+USER root
 
-RUN apt-get update && apt-get install -y build-essential sqlite3 libsqlite3-dev \
- && gem install mailcatcher -v 0.6.5 --no-ri --no-rdoc \
- && apt-get remove --purge -y build-essential libsqlite3-dev && apt-get autoclean && apt-get clean \
- && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+# Create a custom user to run the container on
+RUN addgroup mailcatcher \
+ && adduser -u 1000 -D -S -G mailcatcher mailcatcher \
+ && mkdir -p /home/mailcatcher \
+ && touch /home/mailcatcher/.profile \
+ && chown -R mailcatcher:mailcatcher /home/mailcatcher \
+ && mkdir /data \
+ && chown -R mailcatcher:mailcatcher /data
 
-# Expose SMTP and the webserver port:
-EXPOSE 1025
-EXPOSE 1080
+# Install mailcatcher
+RUN set -xe \
+ && apk add --no-cache libstdc++ sqlite-libs \
+ && apk add --no-cache --virtual .build-deps build-base sqlite-dev \
+ && gem install mailcatcher --no-ri --no-rdoc \
+ && apk del .build-deps
 
-# The command to run
-CMD ["mailcatcher", "-f", "--ip=0.0.0.0"]
+# Run as node
+USER mailcatcher
+
+# Expose ports
+EXPOSE 1025 1080
+
+# The default command to execute
+CMD ["mailcatcher", "--no-quit", "--foreground", "--ip=0.0.0.0"]
